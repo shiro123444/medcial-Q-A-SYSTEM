@@ -12,8 +12,8 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000,
-    open: true,
+    port: 3001, // 更改端口为3001
+    open: false, // 关闭自动打开浏览器
     cors: true
   }
 })

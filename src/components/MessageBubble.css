@@ -188,14 +188,16 @@
 
 /* 评分星号样式 */
 .rating {
+  display: inline-block;
   color: #f59e0b; /* 金色 */
   font-weight: bold;
+  margin: 0 0.25rem;
 }
 
-.rating-1 { opacity: 0.5; }
-.rating-2 { opacity: 0.6; }
-.rating-3 { opacity: 0.8; }
-.rating-4 { opacity: 1; }
+.rating-1 { color: #f59e0b; opacity: 0.5; }
+.rating-2 { color: #f59e0b; opacity: 0.7; }
+.rating-3 { color: #f59e0b; opacity: 0.9; }
+.rating-4 { color: #f59e0b; opacity: 1; }
 
 /* 加粗和斜体样式 */
 .markdown-content strong {
@@ -217,14 +219,19 @@
   margin-bottom: 0.5rem;
 }
 
-/* 警告标记 */
-.markdown-content li:has(span:first-child:contains("⚠️")),
-.markdown-content p:has(span:first-child:contains("⚠️")) {
+/* 警告项目样式 */
+.warning-item {
   padding-left: 0.5rem;
   border-left: 3px solid #f59e0b;
   background-color: rgba(245, 158, 11, 0.1);
   padding: 0.5rem;
   border-radius: 0.25rem;
+}
+
+/* 警告表情符号 */
+.warning-symbol {
+  color: #f59e0b;
+  font-weight: bold;
 }
 
 /* Dark mode adjustments */

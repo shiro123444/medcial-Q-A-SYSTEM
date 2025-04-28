@@ -255,28 +255,15 @@ const ChatContainer = ({ onMessagesUpdate }) => {
       // 记录所有找到的实体，不只限于疾病
       const entities = new Map();
       
-      // 特殊处理：如果没有疾病节点但有其他节点，直接提取所有节点信息
-      let hasDisease = false;
+      // 详细处理节点属性 - 记录所有属性
+      console.log("处理节点属性...");
       
-      // 检查是否有疾病节点
-      for (const node of nodes) {
-        if (node.labels && Array.isArray(node.labels) && node.labels.includes('Disease')) {
-          hasDisease = true;
-          break;
-        }
-        if (node.properties && node.properties.name && 
-           (node.properties.name.includes('感冒') || node.properties.name.includes('冒'))) {
-          hasDisease = true;
-          break;
-        }
-      }
-      
-      // 直接处理所有节点和关系
+      // 先处理所有节点，完整收集节点属性
       for (const node of nodes) {
         // 获取节点名称或标识符
         const nodeName = node.properties?.name || 
-                         node.properties?.title || 
-                         `节点-${node.id.substring(0, 8)}`;
+                        node.properties?.title || 
+                        `节点-${node.id.substring(0, 8)}`;
         
         // 确定节点类型
         let nodeType = node.labels && node.labels.length > 0 ? node.labels[0] : '未知类型';
@@ -286,10 +273,24 @@ const ChatContainer = ({ onMessagesUpdate }) => {
           nodeType = 'Disease';
         }
         
-        // 创建实体对象
+        // 提取所有节点属性
+        const properties = {};
+        if (node.properties) {
+          // 记录节点的所有原始属性
+          Object.assign(properties, node.properties);
+          
+          // 特别打印"感冒"节点的所有属性
+          if (nodeName.includes('感冒')) {
+            console.log('感冒节点的所有属性:', JSON.stringify(node.properties, null, 2));
+          }
+        }
+        
+        // 创建更完整的实体对象
         if (!entities.has(nodeName)) {
           entities.set(nodeName, {
+            id: node.id,
             type: nodeType,
+            properties: properties, // 存储所有属性
             symptoms: new Set(),
             causes: new Set(),
             treatments: new Set(),
@@ -318,9 +319,11 @@ const ChatContainer = ({ onMessagesUpdate }) => {
         // 确保实体存在
         if (!entities.has(startName)) {
           const nodeType = startNode.labels && startNode.labels.length > 0 ? 
-                           startNode.labels[0] : '未知类型';
+                          startNode.labels[0] : '未知类型';
           entities.set(startName, {
+            id: startNode.id,
             type: nodeType,
+            properties: startNode.properties || {},
             symptoms: new Set(),
             causes: new Set(),
             treatments: new Set(),
@@ -368,40 +371,65 @@ const ChatContainer = ({ onMessagesUpdate }) => {
         }
       }
       
-      // 将收集的信息格式化为字符串
+      // 将收集的信息格式化为字符串，包含所有节点属性
       let contextString = '知识图谱信息:\n\n';
       
       // 优先处理疾病实体
       for (const [name, info] of entities.entries()) {
-        // 跳过无关实体
-        if (info.relationships.length === 0 && 
-            info.symptoms.size === 0 && 
-            info.causes.size === 0 && 
-            info.treatments.size === 0 && 
-            info.foods.size === 0 && 
-            info.related.size === 0) {
-          continue;
-        }
-        
         // 不使用纯大写的标题
         const entityType = info.type === 'DISEASE' ? '疾病' : 
-                          info.type === 'Disease' ? '疾病' : 
-                          info.type === 'SYMPTOM' ? '症状' : 
-                          info.type === 'Symptom' ? '症状' : 
-                          info.type === 'FOOD' ? '食物' : info.type;
+                           info.type === 'Disease' ? '疾病' : 
+                           info.type === 'SYMPTOM' ? '症状' : 
+                           info.type === 'Symptom' ? '症状' : 
+                           info.type === 'FOOD' ? '食物' : info.type;
         
         contextString += `${entityType}: ${name}\n`;
         
+        // 添加所有节点属性
+        if (info.properties && Object.keys(info.properties).length > 0) {
+          // 特殊属性的映射
+          const specialProperties = {
+            'desc': '描述',
+            'cause': '病因',
+            'prevent': '预防',
+            'cure_way': '治疗方法',
+            'cure_lasttime': '治疗时长',
+            'cure_department': '科室',
+            'cured_prob': '治愈率',
+            'easy_get': '易感人群',
+            'name': '名称'
+          };
+          
+          // 处理每个属性
+          for (const [key, value] of Object.entries(info.properties)) {
+            // 跳过已经处理过的名称属性
+            if (key === 'name') continue;
+            
+            // 处理特殊属性
+            const displayName = specialProperties[key] || key;
+            
+            // 格式化长文本
+            if (typeof value === 'string' && value.length > 100) {
+              // 为长文本添加换行
+              const formattedValue = value.replace(/。/g, '。\n');
+              contextString += `${displayName}:\n${formattedValue}\n`;
+            } else {
+              contextString += `${displayName}: ${value}\n`;
+            }
+          }
+        }
+        
+        // 添加关系信息
         if (info.symptoms.size > 0) {
           contextString += `症状: ${Array.from(info.symptoms).join(', ')}\n`;
         }
         
         if (info.causes.size > 0) {
-          contextString += `病因: ${Array.from(info.causes).join(', ')}\n`;
+          contextString += `相关病因: ${Array.from(info.causes).join(', ')}\n`;
         }
         
         if (info.treatments.size > 0) {
-          contextString += `治疗: ${Array.from(info.treatments).join(', ')}\n`;
+          contextString += `治疗方式: ${Array.from(info.treatments).join(', ')}\n`;
         }
         
         if (info.foods.size > 0) {
@@ -440,59 +468,83 @@ const ChatContainer = ({ onMessagesUpdate }) => {
     } catch (error) {
       console.error("格式化Neo4j结果时出错:", error);
       
-      // 出错时返回一个简单的节点列表
+      // 出错时返回一个简单的节点列表，但尝试包含更多属性
       try {
         let fallbackContext = "知识图谱信息 (原始):\n\n";
         
-        // 列出所有节点
+        // 列出所有节点及其属性
         if (nodes.length > 0) {
           fallbackContext += "找到的实体:\n";
           nodes.forEach(node => {
             const name = node.properties?.name || 
-                        node.properties?.title || 
-                        `实体-${node.id.substring(0, 8)}`;
-            fallbackContext += `- ${name}\n`;
+                         node.properties?.title || 
+                         `实体-${node.id.substring(0, 8)}`;
+            
+            fallbackContext += `- ${name} (${node.labels.join(', ')}):\n`;
+            
+            // 尝试添加重要的节点属性
+            if (node.properties) {
+              for (const [key, value] of Object.entries(node.properties)) {
+                if (key !== 'name' && key !== 'title') {
+                  fallbackContext += `  - ${key}: ${value}\n`;
+                }
+              }
+            }
           });
         }
         
         // 列出部分关系
         if (relationships.length > 0) {
-          fallbackContext += "\n关系 (前10个):\n";
-          relationships.slice(0, 10).forEach(rel => {
-            fallbackContext += `- 关系类型: ${rel.type}\n`;
+          fallbackContext += "\n关系:\n";
+          relationships.forEach(rel => {
+            const startNode = nodeMap.get(rel.startNodeId);
+            const endNode = nodeMap.get(rel.endNodeId);
+            
+            if (startNode && endNode) {
+              const startName = startNode.properties?.name || `实体-${rel.startNodeId.substring(0, 8)}`;
+              const endName = endNode.properties?.name || `实体-${rel.endNodeId.substring(0, 8)}`;
+              
+              fallbackContext += `- ${startName} -> [${rel.type}] -> ${endName}\n`;
+            }
           });
         }
         
         return fallbackContext.trim();
       } catch (fallbackError) {
         console.error("生成备用上下文也失败:", fallbackError);
-        return "在知识图谱中找到一些信息，但无法正确格式化。";
+        return "在知识图谱中找到一些信息，但无法正确格式化。如果你正在查询疾病信息，请尝试精确指定疾病名称。";
       }
     }
   };
 
   // 构建增强后的提示词
   const buildEnhancedPrompt = (text, neo4jContext) => {
-    return `你是 Thinking Bio 医疗助手，一个专业的医疗诊断问答系统。请根据以下知识图谱中的医学信息，回答用户的问题。
+    return `你是 Thinking Bio 医疗助手，一个具备自主思考和知识探索能力的专业医疗诊断问答系统。请根据以下知识图谱中的医学信息，回答用户的问题。
 
 你的工作流程：
-1. 首先分析用户问题，识别其中的主要症状、疾病或医学主题
+1. 首先深入分析用户问题，识别其中的主要症状、疾病或医学主题
 2. 确定这些主题的类别（如：症状、疾病、药物等）
-3. 如果用户提供的信息不足，主动询问关键信息：
+3. 仔细检查知识图谱提供的信息是否完整：
+   - 如果发现信息不完整，主动思考可能缺少哪些关键属性
+   - 例如，疾病节点通常应有：描述(desc)、病因(cause)、预防(prevent)、治疗方法(cure_way)等属性
+   - 如果发现信息不足，请明确指出，并基于你的医学知识提供补充
+4. 如果用户提供的信息不足，主动询问关键信息：
    - 年龄和性别
    - 症状持续时间
    - 症状严重程度
    - 是否有其他伴随症状
    - 是否有相关病史
-4. 根据所有收集到的信息，利用知识图谱进行更精准的匹配和分析
-5. 提供结构化的专业回答，包括可能的原因、建议措施和注意事项
+5. 根据所有收集到的信息，利用知识图谱进行更精准的匹配和分析
+6. 提供结构化的专业回答，包括可能的原因、建议措施和注意事项
 
-你的回答要求：
-1. 使用专业但通俗易懂的语言
-2. 提供结构化信息，使用Markdown格式提高可读性
-3. 对于医疗建议，明确提醒用户咨询专业医生
-4. 直接引用知识图谱中的信息，不要编造不存在的内容
-5. 如知识图谱中没有相关信息，坦诚告知用户并提供通用建议
+你的回答特性：
+1. 具备自主思考能力 - 不仅仅依赖于知识图谱中的显性信息，还能主动推理隐含信息
+2. 有反思意识 - 能够意识到知识图谱信息可能不完整，并主动补充
+3. 使用专业但通俗易懂的语言
+4. 提供结构化信息，使用Markdown格式提高可读性
+5. 对于医疗建议，明确提醒用户咨询专业医生
+6. 直接引用知识图谱中的信息，同时能够基于专业知识适当扩展
+7. 如知识图谱中没有相关信息，坦诚告知用户并提供基于医学知识的通用建议
 
 知识图谱信息：
 ${neo4jContext}

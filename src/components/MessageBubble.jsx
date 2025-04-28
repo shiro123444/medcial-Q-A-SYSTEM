@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './MessageBubble.css';
 
 // Icon for the AI assistant
@@ -22,172 +22,178 @@ const UserIcon = () => (
   </div>
 );
 
-// 增强的 Markdown 渲染组件
+// 简单的 Markdown 渲染组件
 const MarkdownRenderer = ({ text }) => {
   if (!text) return null;
   
-  // 处理原始文本，支持更多Markdown格式
-  const processText = (rawText) => {
-    // 预处理：处理Unicode表情等特殊字符
-    const processedText = rawText
-      // 保留emoji和特殊字符
-      .replace(/⚠️/g, '⚠️ ');
-      
-    return processedText;
+  // 处理文本，转换 Markdown 为 HTML
+  const renderMarkdown = (markdownText) => {
+    // 分割文本为段落
+    const paragraphs = markdownText.split('\n\n');
+    
+    return (
+      <>
+        {paragraphs.map((paragraph, index) => {
+          // 跳过空段落
+          if (!paragraph.trim()) return null;
+          
+          // 处理标题 (# 标题)
+          if (paragraph.startsWith('# ')) {
+            return <h1 key={index}>{paragraph.substring(2)}</h1>;
+          } else if (paragraph.startsWith('## ')) {
+            return <h2 key={index}>{paragraph.substring(3)}</h2>;
+          } else if (paragraph.startsWith('### ')) {
+            return <h3 key={index}>{paragraph.substring(4)}</h3>;
+          } else if (paragraph.startsWith('#### ')) {
+            return <h4 key={index}>{paragraph.substring(5)}</h4>;
+          } else if (paragraph.startsWith('##### ')) {
+            return <h5 key={index}>{paragraph.substring(6)}</h5>;
+          }
+          
+          // 处理表格
+          else if (paragraph.includes('|') && paragraph.includes('\n') && paragraph.trim().startsWith('|')) {
+            const rows = paragraph.split('\n').filter(row => !row.includes('---'));
+            
+            return (
+              <div className="table-container" key={index}>
+                <table className="markdown-table">
+                  <tbody>
+                    {rows.map((row, rowIndex) => {
+                      const cells = row.split('|')
+                        .filter(cell => cell.trim() !== '')
+                        .map(cell => cell.trim());
+                      
+                      return (
+                        <tr key={rowIndex}>
+                          {cells.map((cell, cellIndex) => (
+                            <td key={cellIndex}>{formatInlineMarkdown(cell)}</td>
+                          ))}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            );
+          }
+          
+          // 处理列表
+          else if (paragraph.includes('\n- ')) {
+            const lines = paragraph.split('\n');
+            const listItems = [];
+            let currentText = '';
+            
+            lines.forEach(line => {
+              if (line.startsWith('- ')) {
+                if (currentText) {
+                  listItems.push(<p key={`p-${listItems.length}`}>{formatInlineMarkdown(currentText)}</p>);
+                  currentText = '';
+                }
+                listItems.push(
+                  <li key={`li-${listItems.length}`}>
+                    {formatInlineMarkdown(line.substring(2))}
+                  </li>
+                );
+              } else {
+                currentText += (currentText ? '\n' : '') + line;
+              }
+            });
+            
+            return (
+              <div key={index}>
+                {currentText && <p>{formatInlineMarkdown(currentText)}</p>}
+                <ul>{listItems.filter(item => item.type === 'li')}</ul>
+              </div>
+            );
+          }
+          
+          // 处理单行列表项
+          else if (paragraph.startsWith('- ')) {
+            return (
+              <ul key={index}>
+                <li>{formatInlineMarkdown(paragraph.substring(2))}</li>
+              </ul>
+            );
+          }
+          
+          // 处理代码块
+          else if (paragraph.startsWith('```') && paragraph.endsWith('```')) {
+            const code = paragraph.substring(3, paragraph.length - 3);
+            return (
+              <pre key={index} className="code-block">
+                <code>{code}</code>
+              </pre>
+            );
+          }
+          
+          // 处理普通段落
+          else {
+            return <p key={index}>{formatInlineMarkdown(paragraph)}</p>;
+          }
+        })}
+      </>
+    );
   };
   
-  // 处理主文本
-  const processedText = processText(text);
-  
-  // 将文本分割成段落
-  const paragraphs = processedText.split('\n\n').filter(p => p.trim());
-  
-  // 处理表格 - 将表格相关的段落组合在一起
-  const combinedParagraphs = [];
-  let tableContent = null;
-  
-  paragraphs.forEach(para => {
-    // 检测表格行 (包含 | 字符的行)
-    if (para.includes('|') && para.trim().startsWith('|') && para.trim().endsWith('|')) {
-      if (tableContent === null) {
-        tableContent = para;
-      } else {
-        tableContent += '\n' + para;
+  // 格式化行内 Markdown
+  const formatInlineMarkdown = (text) => {
+    if (!text) return '';
+    
+    // 使用 React 元素数组替代 HTML 字符串
+    const segments = [];
+    
+    // 处理特殊字符
+    let processedText = text;
+    
+    // 处理加粗 **text**
+    let boldRegex = /\*\*(.*?)\*\*/g;
+    let match;
+    let lastIndex = 0;
+    let tempText = processedText;
+    
+    while ((match = boldRegex.exec(tempText)) !== null) {
+      // 添加匹配前的普通文本
+      if (match.index > lastIndex) {
+        segments.push(tempText.substring(lastIndex, match.index));
       }
-    } else {
-      if (tableContent !== null) {
-        combinedParagraphs.push(tableContent);
-        tableContent = null;
-      }
-      combinedParagraphs.push(para);
+      
+      // 添加加粗文本
+      segments.push(<strong key={`bold-${match.index}`}>{match[1]}</strong>);
+      
+      lastIndex = match.index + match[0].length;
     }
-  });
-  
-  // 处理最后一个表格（如果有）
-  if (tableContent !== null) {
-    combinedParagraphs.push(tableContent);
-  }
+    
+    // 添加剩余文本
+    if (lastIndex < tempText.length) {
+      segments.push(tempText.substring(lastIndex));
+    }
+    
+    // 警告符号特殊处理
+    if (processedText.includes('⚠️')) {
+      return <span className="warning-item">{segments.length > 0 ? segments : processedText}</span>;
+    }
+    
+    // 星号评分特殊处理
+    if (processedText.includes('★')) {
+      if (processedText.includes('★★★★')) {
+        return <span className="rating rating-4">★★★★</span>;
+      } else if (processedText.includes('★★★')) {
+        return <span className="rating rating-3">★★★</span>;
+      } else if (processedText.includes('★★')) {
+        return <span className="rating rating-2">★★</span>;
+      } else if (processedText.includes('★')) {
+        return <span className="rating rating-1">★</span>;
+      }
+    }
+    
+    return segments.length > 0 ? segments : processedText;
+  };
   
   return (
     <div className="markdown-content">
-      {combinedParagraphs.map((paragraph, index) => {
-        // 处理多种类型的标题 (# 或 ####)
-        if (paragraph.startsWith('# ') || paragraph.startsWith('## ') || 
-            paragraph.startsWith('### ') || paragraph.startsWith('#### ') || 
-            paragraph.startsWith('##### ') || paragraph.startsWith('###### ')) {
-          const level = paragraph.indexOf(' ');
-          const headerText = paragraph.substring(level + 1);
-          
-          // 根据#的数量创建对应级别的标题
-          switch (level) {
-            case 1: return <h1 key={index}>{headerText}</h1>;
-            case 2: return <h2 key={index}>{headerText}</h2>;
-            case 3: return <h3 key={index}>{headerText}</h3>;
-            case 4: return <h4 key={index}>{headerText}</h4>;
-            case 5: return <h5 key={index}>{headerText}</h5>;
-            default: return <h6 key={index}>{headerText}</h6>;
-          }
-        }
-        
-        // 处理表格
-        else if (paragraph.includes('|') && paragraph.trim().startsWith('|') && paragraph.trim().endsWith('|')) {
-          const rows = paragraph.split('\n');
-          return (
-            <div className="table-container" key={index}>
-              <table className="markdown-table">
-                <tbody>
-                  {rows.map((row, rowIndex) => {
-                    // 跳过分隔行 (包含 ----- 的行)
-                    if (row.includes('-----')) return null;
-                    
-                    // 提取单元格内容
-                    const cells = row.split('|')
-                      .filter(cell => cell.trim() !== '') // 移除空单元格
-                      .map(cell => cell.trim());
-                    
-                    return (
-                      <tr key={rowIndex}>
-                        {cells.map((cell, cellIndex) => (
-                          <td key={cellIndex}>{cell}</td>
-                        ))}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          );
-        }
-        
-        // 处理列表
-        else if (paragraph.includes('\n- ')) {
-          const parts = paragraph.split('\n- ');
-          const hasPrefixText = !paragraph.startsWith('- ');
-          const prefixText = hasPrefixText ? parts[0] : '';
-          const listItems = hasPrefixText ? parts.slice(1) : parts;
-          
-          return (
-            <div key={index}>
-              {prefixText && <p>{prefixText}</p>}
-              <ul>
-                {listItems.map((item, i) => (
-                  item.trim() ? <li key={i} dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item) }} /> : null
-                ))}
-              </ul>
-            </div>
-          );
-        }
-        
-        // 处理单行列表项
-        else if (paragraph.startsWith('- ')) {
-          return (
-            <ul key={index}>
-              <li dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(paragraph.substring(2)) }} />
-            </ul>
-          );
-        }
-        
-        // 处理代码块
-        else if (paragraph.startsWith('```') && paragraph.endsWith('```')) {
-          const code = paragraph.substring(3, paragraph.length - 3);
-          return (
-            <pre key={index} className="code-block">
-              <code>{code}</code>
-            </pre>
-          );
-        }
-        
-        // 处理段落内的富文本格式
-        else {
-          return <p key={index} dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(paragraph) }} />;
-        }
-      })}
+      {renderMarkdown(text)}
     </div>
   );
-};
-
-// 处理行内Markdown格式 (加粗、斜体、代码等)
-const formatInlineMarkdown = (text) => {
-  if (!text) return '';
-  
-  let formattedText = text;
-  
-  // 处理行内代码 `代码`
-  formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
-  
-  // 处理加粗文本 **文本**
-  formattedText = formattedText.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  
-  // 处理斜体文本 *文本* (避免与加粗冲突)
-  formattedText = formattedText.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-  
-  // 处理星号评分 (★, ★★, ★★★, ★★★★)
-  formattedText = formattedText.replace(/★★★★/g, '<span class="rating rating-4">★★★★</span>');
-  formattedText = formattedText.replace(/★★★/g, '<span class="rating rating-3">★★★</span>');
-  formattedText = formattedText.replace(/★★/g, '<span class="rating rating-2">★★</span>');
-  formattedText = formattedText.replace(/★/g, '<span class="rating rating-1">★</span>');
-  
-  return formattedText;
 };
 
 // Message bubble component with markdown support
