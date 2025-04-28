@@ -1,0 +1,434 @@
+/* Message Bubble Styles */
+.message-container {
+  display: flex;
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+  padding: 0 1rem;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.ai-message {
+  justify-content: flex-start;
+}
+
+.message-icon {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 0.25rem;
+}
+
+.user-message .message-icon {
+  order: 2;
+  margin-left: 0.75rem;
+}
+
+.ai-message .message-icon {
+  margin-right: 0.75rem;
+}
+
+.ai-icon, .user-icon {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.message-bubble {
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  position: relative;
+  max-width: 70%;
+  overflow-wrap: break-word;
+}
+
+.user-bubble {
+  background-color: #646cff;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-bubble {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-bottom-left-radius: 4px;
+}
+
+.message-content {
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Markdown Styles */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdown-content h1 {
+  font-size: 1.5rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.3rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.15rem;
+}
+
+.markdown-content h4 {
+  font-size: 1.1rem;
+}
+
+.markdown-content h5, 
+.markdown-content h6 {
+  font-size: 1rem;
+}
+
+.markdown-content p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.markdown-content ul {
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  list-style-type: decimal;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-content a {
+  color: #646cff;
+  text-decoration: underline;
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid #646cff;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.markdown-content code {
+  font-family: monospace;
+  background-color: rgba(100, 108, 255, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.markdown-content pre {
+  background-color: #1e1e1e;
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 0.9rem;
+  color: #e5e7eb;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.markdown-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.markdown-content table,
+.markdown-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.markdown-content table th,
+.markdown-content table td,
+.markdown-table th,
+.markdown-table td {
+  border: 1px solid #374151;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.markdown-content table th,
+.markdown-table th {
+  background-color: rgba(100, 108, 255, 0.1);
+}
+
+/* 评分星号样式 */
+.rating {
+  color: #f59e0b; /* 金色 */
+  font-weight: bold;
+}
+
+.rating-1 { opacity: 0.5; }
+.rating-2 { opacity: 0.6; }
+.rating-3 { opacity: 0.8; }
+.rating-4 { opacity: 1; }
+
+/* 加粗和斜体样式 */
+.markdown-content strong {
+  font-weight: bold;
+}
+
+.markdown-content em {
+  font-style: italic;
+}
+
+/* 特殊处理有可能需要的 HTML 标签 */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 特殊元素样式 */
+.markdown-content ul li {
+  margin-bottom: 0.5rem;
+}
+
+/* 警告标记 */
+.markdown-content li:has(span:first-child:contains("⚠️")),
+.markdown-content p:has(span:first-child:contains("⚠️")) {
+  padding-left: 0.5rem;
+  border-left: 3px solid #f59e0b;
+  background-color: rgba(245, 158, 11, 0.1);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .markdown-content a {
+    color: #a5b4fc;
+  }
+  
+  .markdown-content blockquote {
+    border-left-color: #a5b4fc;
+    color: #9ca3af;
+  }
+  
+  .markdown-content code {
+    background-color: rgba(165, 180, 252, 0.1);
+  }
+  
+  .markdown-content table th,
+  .markdown-table th {
+    background-color: rgba(165, 180, 252, 0.1);
+  }
+  
+  .rating {
+    color: #fbbf24; /* 深色模式下的金色 */
+  }
+}
+
+/* Markdown Styles */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.message-content h1 {
+  font-size: 1.5rem;
+}
+
+.message-content h2 {
+  font-size: 1.3rem;
+}
+
+.message-content h3 {
+  font-size: 1.15rem;
+}
+
+.message-content p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content ul, 
+.message-content ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.message-content ul {
+  list-style-type: disc;
+}
+
+.message-content ol {
+  list-style-type: decimal;
+}
+
+.message-content li {
+  margin-bottom: 0.25rem;
+}
+
+.message-content a {
+  color: #646cff;
+  text-decoration: underline;
+}
+
+.message-content blockquote {
+  border-left: 4px solid #646cff;
+  padding-left: 1rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.message-content code {
+  font-family: monospace;
+  background-color: rgba(100, 108, 255, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.message-content pre {
+  background-color: #1e1e1e;
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.message-content pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 0.9rem;
+  color: #e5e7eb;
+}
+
+.markdown-table-container {
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+
+.markdown-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.message-content table th,
+.message-content table td {
+  border: 1px solid #374151;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.message-content table th {
+  background-color: rgba(100, 108, 255, 0.1);
+}
+
+/* Dark mode adjustments for markdown */
+@media (prefers-color-scheme: dark) {
+  .message-content a {
+    color: #a5b4fc;
+  }
+  
+  .message-content blockquote {
+    border-left-color: #a5b4fc;
+    color: #9ca3af;
+  }
+  
+  .message-content code {
+    background-color: rgba(165, 180, 252, 0.1);
+  }
+  
+  .message-content table th {
+    background-color: rgba(165, 180, 252, 0.1);
+  }
+}
+
+/* Loading animation */
+.loading-bubble {
+  min-width: 70px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.loading-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #6b7280;
+  animation: loading 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes loading {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .ai-bubble {
+    background-color: #374151;
+    color: #e5e7eb;
+  }
+  
+  .loading-dots span {
+    background-color: #9ca3af;
+  }
+}

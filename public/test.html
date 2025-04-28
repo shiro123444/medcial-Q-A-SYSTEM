@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Neo4j可视化测试</title>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/neo4j-driver@4.4.6/lib/browser/neo4j-web.min.js"></script>
+    <script src="https://unpkg.com/vis-network@9.1.2/standalone/umd/vis-network.min.js"></script>
+    <script src="https://unpkg.com/neovis.js@2.0.2"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        #viz { 
+            width: 100%; 
+            height: 600px; 
+            border: 1px solid #ddd; 
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #debug { 
+            width: 100%; 
+            margin: 20px auto; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            background: white; 
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #controls { 
+            width: 100%; 
+            margin: 20px auto; 
+            text-align: center; 
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        button { 
+            padding: 12px 20px; 
+            margin: 5px; 
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #4338ca;
+        }
+        .error { 
+            color: #dc2626; 
+            font-weight: bold; 
+        }
+        .success { 
+            color: #059669; 
+        }
+        .config-panel {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .config-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .config-row label {
+            width: 120px;
+            font-weight: bold;
+            color: #374151;
+        }
+        .config-row input, .config-row select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .clear-button {
+            background-color: #6b7280;
+        }
+        .clear-button:hover {
+            background-color: #4b5563;
+        }
+        .node-properties {
+            font-family: monospace;
+            background-color: #f3f4f6;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow: auto;
+            margin-top: 10px;
+        }
+        #node-info-panel {
+            position: absolute;
+            right: 20px;
+            top: 80px;
+            width: 300px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            display: none;
+            z-index: 100;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .panel-header h3 {
+            margin: 0;
+            color: #374151;
+        }
+        .panel-header button {
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+        .node-type {
+            margin-bottom: 10px;
+        }
+        .type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .type-badge.disease {
+            background-color: #ef4444;
+        }
+        .type-badge.symptom {
+            background-color: #f59e0b;
+        }
+        .property-row {
+            display: flex;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .property-key {
+            font-weight: bold;
+            width: 120px;
+            color: #4b5563;
+        }
+        .property-value {
+            flex: 1;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>Neo4j可视化测试</h1>
+    
+    <div class="config-panel">
+        <h2>连接配置</h2>
+        <div class="config-row">
+            <label for="server-url">服务器URL:</label>
+            <input type="text" id="server-url" value="bolt://localhost:7687">
+        </div>
+        <div class="config-row">
+            <label for="username">用户名:</label>
+            <input type="text" id="username" value="neo4j">
+        </div>
+        <div class="config-row">
+            <label for="password">密码:</label>
+            <input type="password" id="password" value="fyz040913">
+        </div>
+        <div class="config-row">
+            <label for="database">数据库:</label>
+            <input type="text" id="database" value="neo4j">
+        </div>
+    </div>
+    
+    <div class="config-panel">
+        <h2>查询配置</h2>
+        <div class="config-row">
+            <label for="query-type">预设查询:</label>
+            <select id="query-type">
+                <option value="simple">简单查询 (前10个节点)</option>
+                <option value="relationships">节点关系查询</option>
+                <option value="diabetes">糖尿病相关查询</option>
+                <option value="custom">自定义查询</option>
+            </select>
+        </div>
+        <div id="custom-query-container" style="display: none;">
+            <p><strong>自定义Cypher查询:</strong></p>
+            <textarea id="custom-query">MATCH (n) RETURN n LIMIT 10</textarea>
+        </div>
+    </div>
+    
+    <div class="config-panel">
+        <h2>显示配置</h2>
+        <div class="config-row">
+            <label for="caption-property">标签属性:</label>
+            <input type="text" id="caption-property" value="cause,desc,id">
+            <span style="margin-left: 10px; color: #6b7280; font-size: 0.9em;">用逗号分隔多个属性</span>
+        </div>
+        <div class="config-row">
+            <label for="node-font-size">节点字体大小:</label>
+            <input type="number" id="node-font-size" value="14" min="8" max="24">
+        </div>
+        <div class="config-row">
+            <label for="node-size">节点大小:</label>
+            <input type="number" id="node-size" value="25" min="10" max="50">
+        </div>
+        <div class="config-row">
+            <label for="show-relationships">显示关系:</label>
+            <input type="checkbox" id="show-relationships" checked>
+        </div>
+    </div>
+    
+    <div id="controls">
+        <div class="button-container">
+            <button onclick="testConnection()">测试Neo4j连接</button>
+            <button onclick="getNodeLabels()" style="background-color: #8b5cf6;">获取节点标签</button>
+        </div>
+        <div class="button-container">
+            <button onclick="getRelationshipTypes()" style="background-color: #8b5cf6;">获取关系类型</button>
+        </div>
+        <div class="button-container">
+            <button onclick="renderViz()">渲染图谱</button>
+            <button onclick="clearViz()" class="clear-button">清除图谱</button>
+        </div>
+        <div class="button-container">
+            <button onclick="clearLogs()" class="clear-button">清除日志</button>
+        </div>
+    </div>
+    
+    <div id="viz"></div>
+    
+    <div id="node-info-panel">
+        <div class="panel-header">
+            <h3>节点信息</h3>
+            <button onclick="closeNodeInfo()">×</button>
+        </div>
+        <div id="node-info-content"></div>
+    </div>
+    
+    <div id="debug">
+        <h3>调试信息：</h3>
+        <div id="debug-content"></div>
+    </div>
+    
+    <script>
+        // 监听查询类型变化，显示/隐藏自定义查询输入框
+        document.getElementById('query-type').addEventListener('change', function() {
+            const customQueryContainer = document.getElementById('custom-query-container');
+            if (this.value === 'custom') {
+                customQueryContainer.style.display = 'block';
+            } else {
+                customQueryContainer.style.display = 'none';
+            }
+        });
+        
+        // 全局变量存储当前可视化实例
+        let currentViz = null;
+        
+        function log(message, isError = false) {
+            const debugEl = document.getElementById('debug-content');
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            if (isError) p.className = 'error';
+            else p.className = 'success';
+            debugEl.appendChild(p);
+            debugEl.scrollTop = debugEl.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLogs() {
+            document.getElementById('debug-content').innerHTML = '';
+            log('日志已清除');
+        }
+        
+        function clearViz() {
+            document.getElementById('viz').innerHTML = '';
+            log('图谱已清除');
+        }
+        
+        // 获取连接配置
+        function getConnectionConfig() {
+            return {
+                serverUrl: document.getElementById('server-url').value,
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                database: document.getElementById('database').value
+            };
+        }
+        
+        // 显示节点信息面板
+        function showNodeInfo(node) {
+            const panel = document.getElementById('node-info-panel');
+            const content = document.getElementById('node-info-content');
+            
+            // 清空之前的内容
+            content.innerHTML = '';
+            
+            // 添加节点类型
+            const typeDiv = document.createElement('div');
+            typeDiv.className = 'node-type';
+            const typeBadge = document.createElement('span');
+            typeBadge.className = `type-badge ${node.labels[0].toLowerCase()}`;
+            typeBadge.textContent = node.labels.join(', ');
+            typeDiv.appendChild(typeBadge);
+            content.appendChild(typeDiv);
+            
+            // 添加节点属性
+            for (const [key, value] of Object.entries(node.properties)) {
+                const row = document.createElement('div');
+                row.className = 'property-row';
+                
+                const keyEl = document.createElement('div');
+                keyEl.className = 'property-key';
+                keyEl.textContent = key + ':';
+                
+                const valueEl = document.createElement('div');
+                valueEl.className = 'property-value';
+                valueEl.textContent = value;
+                
+                row.appendChild(keyEl);
+                row.appendChild(valueEl);
+                content.appendChild(row);
+            }
+            
+            // 显示面板
+            panel.style.display = 'block';
+        }
+        
+        // 关闭节点信息面板
+        function closeNodeInfo() {
+            document.getElementById('node-info-panel').style.display = 'none';
+        }
+        
+        // 测试连接
+        async function testConnection() {
+            log('测试Neo4j连接...');
+            const config = getConnectionConfig();
+            
+            try {
+                const driver = neo4j.driver(
+                    config.serverUrl,
+                    neo4j.auth.basic(config.username, config.password)
+                );
+                
+                const session = driver.session({
+                    database: config.database
+                });
+                
+                try {
+                    const result = await session.run('MATCH (n) RETURN count(n) AS count LIMIT 1');
+                    const count = result.records[0].get('count').toNumber();
+                    log(`连接成功! 数据库中有 ${count} 个节点.`);
+                    
+                    // 测试图谱查询
+                    const testQuery = await session.run('MATCH (n)-[r]-(m) RETURN n, r, m LIMIT 5');
+                    log(`测试查询返回了 ${testQuery.records.length} 条记录.`);
+                    
+                    return true;
+                } finally {
+                    await session.close();
+                    await driver.close();
+                }
+            } catch (error) {
+                log(`连接失败: ${error.message}`, true);
+                return false;
+            }
+        }
+        
+        // 获取数据库中的节点标签
+        async function getNodeLabels() {
+            log('获取数据库中的节点标签...');
+            const config = getConnectionConfig();
+            
+            try {
+                const driver = neo4j.driver(
+                    config.serverUrl,
+                    neo4j.auth.basic(config.username, config.password)
+                );
+                
+                const session = driver.session({
+                    database: config.database
+                });
+                
+                try {
+                    // 获取所有标签
+                    const labelsResult = await session.run('CALL db.labels()');
+                    const labels = labelsResult.records.map(record => record.get('label'));
+                    log(`数据库中的节点标签: ${labels.join(', ')}`);
+                    
+                    // 获取样本节点及其属性
+                    const nodePropertiesResult = await session.run('MATCH (n) RETURN DISTINCT labels(n) AS labels, properties(n) AS properties LIMIT 10');
+                    log(`<strong>节点属性样本:</strong>`);
+                    
+                    const propertiesDiv = document.createElement('div');
+                    propertiesDiv.className = 'node-properties';
+                    
+                    nodePropertiesResult.records.forEach((record, index) => {
+                        const labels = record.get('labels');
+                        const properties = record.get('properties');
+                        propertiesDiv.innerHTML += `<div>节点 ${index+1} [${labels.join(':')}]: ${JSON.stringify(properties, null, 2)}</div><hr>`;
+                    });
+                    
+                    const debugEl = document.getElementById('debug-content');
+                    debugEl.appendChild(propertiesDiv);
+                    
+                    return true;
+                } finally {
+                    await session.close();
+                    await driver.close();
+                }
+            } catch (error) {
+                log(`获取节点标签失败: ${error.message}`, true);
+                return false;
+            }
+        }
+        
+        // 获取数据库中的关系类型
+        async function getRelationshipTypes() {
+            log('获取数据库中的关系类型...');
+            const config = getConnectionConfig();
+            
+            try {
+                const driver = neo4j.driver(
+                    config.serverUrl,
+                    neo4j.auth.basic(config.username, config.password)
+                );
+                
+                const session = driver.session({
+                    database: config.database
+                });
+                
+                try {
+                    // 获取所有关系类型
+                    const relationshipTypesResult = await session.run('CALL db.relationshipTypes()');
+                    const relationshipTypes = relationshipTypesResult.records.map(record => record.get('relationshipType'));
+                    log(`数据库中的关系类型: ${relationshipTypes.join(', ')}`);
+                    
+                    // 获取样本关系及其属性
+                    const relPropertiesResult = await session.run(`
+                        MATCH ()-[r]->() 
+                        WITH type(r) AS relType, r AS rel
+                        RETURN DISTINCT relType, properties(rel) AS properties
+                        LIMIT 10
+                    `);
+                    
+                    log(`<strong>关系属性样本:</strong>`);
+                    
+                    const propertiesDiv = document.createElement('div');
+                    propertiesDiv.className = 'node-properties';
+                    
+                    relPropertiesResult.records.forEach((record, index) => {
+                        const relType = record.get('relType');
+                        const properties = record.get('properties');
+                        propertiesDiv.innerHTML += `<div>关系 ${index+1} [${relType}]: ${JSON.stringify(properties, null, 2)}</div><hr>`;
+                    });
+                    
+                    const debugEl = document.getElementById('debug-content');
+                    debugEl.appendChild(propertiesDiv);
+                    
+                    return relationshipTypes;
+                } finally {
+                    await session.close();
+                    await driver.close();
+                }
+            } catch (error) {
+                log(`获取关系类型失败: ${error.message}`, true);
+                return [];
+            }
+        }
+        
+        // 获取选择的查询
+        function getSelectedQuery() {
+            const queryType = document.getElementById('query-type').value;
+            let cypher;
+            
+            switch(queryType) {
+                case 'simple':
+                    cypher = 'MATCH (n) RETURN n LIMIT 10';
+                    break;
+                case 'relationships':
+                    cypher = 'MATCH (n)-[r]-(m) RETURN n, r, m LIMIT 15';
+                    break;
+                case 'diabetes':
+                    cypher = `MATCH (n)-[r]-(m) 
+                             WHERE toLower(n.cause) =~ '(?i).*糖尿病.*' 
+                             OR toLower(n.desc) =~ '(?i).*糖尿病.*' 
+                             OR toLower(m.cause) =~ '(?i).*糖尿病.*' 
+                             OR toLower(m.desc) =~ '(?i).*糖尿病.*' 
+                             RETURN n, r, m LIMIT 25`;
+                    break;
+                case 'custom':
+                    cypher = document.getElementById('custom-query').value;
+                    break;
+                default:
+                    cypher = 'MATCH (n) RETURN n LIMIT 10';
+            }
+            
+            return cypher;
+        }
+        
+        // 渲染可视化
+        function renderViz() {
+            log('准备渲染图谱...');
+            document.getElementById('viz').innerHTML = '';
+            
+            const config = getConnectionConfig();
+            const cypher = getSelectedQuery();
+            const captionProperties = document.getElementById('caption-property').value.split(',').map(p => p.trim());
+            const fontSize = parseInt(document.getElementById('node-font-size').value) || 14;
+            const nodeSize = parseInt(document.getElementById('node-size').value) || 25;
+            const showRelationships = document.getElementById('show-relationships').checked;
+            
+            log(`使用查询: ${cypher}`);
+            
+            try {
+                // 创建标签配置
+                const labelConfig = {
+                    Node: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#6366f1'
+                    },
+                    Disease: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#ef4444'
+                    },
+                    Symptom: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#f59e0b'
+                    },
+                    Treatment: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#10b981'
+                    },
+                    Cause: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#8b5cf6'
+                    },
+                    Drug: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#0ea5e9'
+                    },
+                    Food: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#84cc16'
+                    },
+                    Check: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#a855f7'
+                    },
+                    Department: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#ec4899'
+                    },
+                    Producer: {
+                        caption: captionProperties,
+                        size: nodeSize,
+                        color: '#14b8a6'
+                    }
+                };
+                
+                // 创建关系配置
+                const relationshipConfig = {};
+                // 添加一些常见的关系类型
+                ['accompany_with', 'has_symptom', 'need_check', 'do_eat', 'no_eat', 'department', 'cure_way', 'cure_department'].forEach(relType => {
+                    relationshipConfig[relType] = {
+                        caption: true,
+                        thickness: 1,
+                        color: showRelationships ? '#9ca3af' : 'rgba(0,0,0,0)'
+                    };
+                });
+                
+                // 创建neovis配置
+                const vizConfig = {
+                    containerId: 'viz',
+                    neo4j: {
+                        serverUrl: config.serverUrl,
+                        serverUser: config.username,
+                        serverPassword: config.password,
+                        driverConfig: { database: config.database }
+                    },
+                    labels: labelConfig,
+                    relationships: relationshipConfig,
+                    initialCypher: cypher,
+                    visConfig: {
+                        nodes: {
+                            shape: 'dot',
+                            font: {
+                                color: '#000000',
+                                size: fontSize,
+                                face: 'Arial',
+                                strokeWidth: 2,
+                                strokeColor: '#ffffff'
+                            },
+                            scaling: {
+                                label: { enabled: true }
+                            }
+                        },
+                        edges: {
+                            arrows: { to: { enabled: true } },
+                            font: {
+                                color: '#000000',
+                                size: Math.max(8, fontSize - 4),
+                                face: 'Arial',
+                                strokeWidth: 2,
+                                strokeColor: '#ffffff'
+                            },
+                            smooth: { enabled: true },
+                            // 如果不显示关系，设置线为透明
+                            color: { color: showRelationships ? '#9ca3af' : 'rgba(0,0,0,0)' },
+                            width: showRelationships ? 1 : 0
+                        },
+                        physics: {
+                            stabilization: {
+                                enabled: true,
+                                iterations: 100
+                            }
+                        },
+                        interaction: {
+                            hover: true,
+                            navigationButtons: true,
+                            keyboard: {
+                                enabled: true
+                            }
+                        }
+                    }
+                };
+                
+                // 创建neovis实例
+                const viz = new NeoVis.default(vizConfig);
+                currentViz = viz;
+                
+                // 注册事件处理程序
+                viz.registerOnEvent('completed', function(e) {
+                    log('图谱渲染完成!');
+                    
+                    // 尝试检查渲染了多少节点
+                    let nodeCount = 0;
+                    if (viz.nodes && Array.isArray(viz.nodes)) {
+                        nodeCount = viz.nodes.length;
+                    } else if (viz.network && viz.network.body && viz.network.body.nodes) {
+                        nodeCount = Object.keys(viz.network.body.nodes).length;
+                    } else if (e && e.recordCount) {
+                        nodeCount = e.recordCount;
+                    }
+                    
+                    log(`渲染了 ${nodeCount} 个节点`);
+                    
+                    // 如果有网络对象，添加点击事件
+                    if (viz.network) {
+                        viz.network.on('click', function(params) {
+                            if (params.nodes.length > 0) {
+                                const nodeId = params.nodes[0];
+                                // 尝试通过多种方式获取节点数据
+                                let node = null;
+                                if (viz.nodeMap && viz.nodeMap.get) {
+                                    node = viz.nodeMap.get(nodeId);
+                                } else if (viz.network.body.nodes[nodeId]) {
+                                    node = {
+                                        labels: [viz.network.body.nodes[nodeId].options.group || 'Node'],
+                                        properties: viz.network.body.nodes[nodeId].options.properties || {}
+                                    };
+                                }
+                                
+                                if (node) {
+                                    log(`点击了节点: ${JSON.stringify(node.labels)} - ${JSON.stringify(node.properties)}`);
+                                    showNodeInfo(node);
+                                }
+                            } else {
+                                closeNodeInfo();
+                            }
+                        });
+                    }
+                });
+                
+                viz.registerOnEvent('error', function(e) {
+                    log(`渲染错误: ${e ? (e.message || JSON.stringify(e)) : '未知错误'}`, true);
+                });
+                
+                log('开始渲染图谱...');
+                viz.render();
+                
+            } catch (error) {
+                log(`初始化错误: ${error.message}`, true);
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

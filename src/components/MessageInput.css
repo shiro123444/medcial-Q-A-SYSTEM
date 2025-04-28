@@ -1,0 +1,120 @@
+/* MessageInput.css */
+.message-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem;
+  background: linear-gradient(to top, rgba(255, 255, 255, 1) 70%, rgba(255, 255, 255, 0));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.input-form {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 750px;
+  background: #f3f4f6;
+  border-radius: 24px;
+  padding: 0.75rem;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  position: relative;
+}
+
+textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: none;
+  max-height: 150px;
+  outline: none;
+  font-family: inherit;
+}
+
+.send-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  margin-left: 0.5rem;
+}
+
+.send-button:hover:not(.disabled) {
+  background-color: #535bf2;
+  transform: scale(1.05);
+}
+
+.send-button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.plus-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  color: #6b7280;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-right: 0.75rem;
+}
+
+.plus-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.input-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .message-input-container {
+    background: linear-gradient(to top, rgba(30, 30, 30, 1) 70%, rgba(30, 30, 30, 0));
+  }
+  
+  .input-form {
+    background-color: #374151;
+    border-color: #4b5563;
+  }
+  
+  textarea {
+    color: #e5e7eb;
+  }
+  
+  textarea::placeholder {
+    color: #9ca3af;
+  }
+  
+  .plus-button {
+    color: #9ca3af;
+  }
+  
+  .plus-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}

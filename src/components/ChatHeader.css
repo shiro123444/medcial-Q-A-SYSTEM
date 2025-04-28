@@ -1,0 +1,161 @@
+/* ChatHeader.css */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: sticky;
+  top: 60px;
+  z-index: 10;
+}
+
+.chat-title h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.chat-subtitle {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-indicator.green {
+  background-color: #10b981;
+}
+
+.status-indicator.red {
+  background-color: #ef4444;
+}
+
+.status-indicator.yellow {
+  background-color: #f59e0b;
+  animation: pulse 1.5s infinite;
+}
+
+.chat-controls {
+  display: flex;
+  align-items: center;
+}
+
+.model-selection {
+  display: flex;
+  align-items: center;
+  margin-right: 1.5rem;
+}
+
+.model-selection label {
+  margin-right: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.clear-chat-button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-chat-button:hover {
+  background-color: #e5e7eb;
+}
+
+.clear-chat-button svg {
+  margin-right: 0.5rem;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .chat-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chat-controls {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .chat-title h1 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .model-selection label {
+    display: none;
+  }
+  
+  .clear-chat-button span {
+    display: none;
+  }
+  
+  .clear-chat-button svg {
+    margin-right: 0;
+  }
+  
+  .clear-chat-button {
+    padding: 0.5rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .chat-header {
+    background-color: rgba(31, 41, 55, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .chat-title h1 {
+    color: #f3f4f6;
+  }
+  
+  .chat-subtitle {
+    color: #9ca3af;
+  }
+  
+  .clear-chat-button {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #d1d5db;
+  }
+  
+  .clear-chat-button:hover {
+    background-color: #4b5563;
+  }
+}

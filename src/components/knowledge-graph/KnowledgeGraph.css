@@ -1,0 +1,591 @@
+/* KnowledgeGraph.css */
+.knowledge-graph-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+  position: relative;
+}
+
+.graph-visualization {
+  width: 100%;
+  height: 600px; /* 增加高度 */
+  background-color: #f9fafb;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd; /* 添加边框以便于调试 */
+}
+
+/* 模拟Neo4j图谱样式 */
+.neo4j-mock-graph {
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  position: relative;
+}
+
+.graph-title {
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 15px;
+}
+
+.nodes-container {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.graph-node {
+  position: absolute;
+  background-color: #ffffff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: scale(0.5);
+  z-index: 2;
+}
+
+.graph-node.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.graph-node.highlight {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.central-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  width: 60px;
+  height: 60px;
+  z-index: 3;
+}
+
+.central-node.visible {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.node-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-bottom: 2px;
+}
+
+.node-label {
+  font-size: 11px;
+  white-space: nowrap;
+  color: #4b5563;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  position: absolute;
+  bottom: -20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 节点类型样式 */
+.disease-node {
+  border: 2px solid #ef4444;
+}
+
+.disease-node .node-icon {
+  background-color: #ef4444;
+}
+
+.symptom-node {
+  border: 2px solid #f59e0b;
+  top: 40px;
+  left: 160px;
+}
+
+.symptom-node:nth-of-type(3) {
+  top: 100px;
+  left: 200px;
+}
+
+.symptom-node:nth-of-type(5) {
+  top: 160px;
+  left: 160px;
+}
+
+.symptom-node .node-icon {
+  background-color: #f59e0b;
+}
+
+.treatment-node {
+  border: 2px solid #10b981;
+  top: 40px;
+  left: 100px;
+}
+
+.treatment-node:nth-of-type(7) {
+  top: 160px;
+  left: 100px;
+}
+
+.treatment-node .node-icon {
+  background-color: #10b981;
+}
+
+.cause-node {
+  border: 2px solid #8b5cf6;
+  top: 70px;
+  left: 60px;
+}
+
+.cause-node:nth-of-type(9) {
+  top: 130px;
+  left: 60px;
+}
+
+.cause-node .node-icon {
+  background-color: #8b5cf6;
+}
+
+/* 连接线样式 */
+.connection {
+  position: absolute;
+  height: 2px;
+  background-color: #9ca3af;
+  transform-origin: 0 50%;
+  opacity: 0;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+}
+
+.connection.visible {
+  opacity: 1;
+}
+
+.symptom-connection {
+  width: 60px;
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.symptom-connection:nth-of-type(2) {
+  transform: translateY(-50%) rotate(30deg);
+}
+
+.symptom-connection:nth-of-type(4) {
+  transform: translateY(-50%) rotate(-30deg);
+}
+
+.treatment-connection {
+  width: 60px;
+  transform: translateY(-50%) rotate(120deg);
+}
+
+.treatment-connection:nth-of-type(6) {
+  transform: translateY(-50%) rotate(150deg);
+}
+
+.cause-connection {
+  width: 60px;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.cause-connection:nth-of-type(8) {
+  transform: translateY(-50%) rotate(210deg);
+}
+
+.relationship-label {
+  position: absolute;
+  font-size: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 1px 4px;
+  border-radius: 4px;
+  white-space: nowrap;
+  color: #6b7280;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* 图例样式 */
+.neo4j-legend {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(249, 250, 251, 0.8);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.legend-color.disease {
+  background-color: #ef4444;
+}
+
+.legend-color.symptom {
+  background-color: #f59e0b;
+}
+
+.legend-color.treatment {
+  background-color: #10b981;
+}
+
+.legend-color.cause {
+  background-color: #8b5cf6;
+}
+
+/* Neovis.js 信息样式 */
+.neovis-info {
+  padding: 15px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.neovis-info p {
+  margin-bottom: 10px;
+}
+
+.neovis-info code {
+  background-color: #e5e7eb;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.neovis-info ol {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+/* 加载和错误状态 */
+.graph-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  min-height: 300px;
+}
+
+.graph-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-radius: 50%;
+  border-top-color: #646cff;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.graph-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #ef4444;
+  text-align: center;
+  padding: 2rem;
+  min-height: 300px;
+}
+
+.graph-error .error-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.graph-error button {
+  padding: 0.5rem 1rem;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.graph-error button:first-child {
+  background-color: #ef4444;
+}
+
+.graph-error button:first-child:hover {
+  background-color: #dc2626;
+}
+
+.debug-toggle-button {
+  background-color: #6b7280 !important;
+}
+
+.debug-toggle-button:hover {
+  background-color: #4b5563 !important;
+}
+
+.debug-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  text-align: left;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 0.875rem;
+}
+
+.debug-info h4 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.debug-section {
+  margin-bottom: 1rem;
+}
+
+.debug-section h5 {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.debug-section p {
+  margin: 0.25rem 0;
+  color: #6b7280;
+}
+
+.debug-section pre {
+  background-color: #e5e7eb;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  overflow-x: auto;
+  color: #1f2937;
+  max-height: 200px;
+  font-size: 0.75rem;
+}
+
+.debug-section ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+  color: #6b7280;
+}
+
+.debug-section code {
+  background-color: #e5e7eb;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  color: #1f2937;
+}
+
+.graph-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  text-align: center;
+  padding: 2rem;
+  min-height: 300px;
+}
+
+/* Neovis.js 专用样式 */
+#neovis-graph {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  /* 确保元素始终可见 */
+  display: block !important;
+  visibility: visible !important;
+  z-index: 5;
+}
+
+.graph-legend {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.legend-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #374151;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.legend-color.disease {
+  background-color: #ef4444;
+}
+
+.legend-color.symptom {
+  background-color: #f59e0b;
+}
+
+.legend-color.treatment {
+  background-color: #10b981;
+}
+
+.legend-color.cause {
+  background-color: #8b5cf6;
+}
+
+/* 未连接状态 */
+.no-connection-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.no-connection-state svg {
+  margin-bottom: 1rem;
+}
+
+.no-connection-state h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #ef4444;
+}
+
+.no-connection-state p {
+  font-size: 0.875rem;
+  max-width: 300px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 暗黑模式支持 */
+@media (prefers-color-scheme: dark) {
+  #neovis-graph {
+    background-color: #1f2937;
+  }
+  
+  .graph-legend {
+    background-color: rgba(31, 41, 55, 0.9);
+  }
+  
+  .legend-title {
+    color: #e5e7eb;
+  }
+  
+  .legend-item {
+    color: #d1d5db;
+  }
+  
+  .no-connection-state {
+    color: #d1d5db;
+  }
+  
+  .no-connection-state h3 {
+    color: #f87171;
+  }
+  
+  .debug-info {
+    background-color: #1f2937;
+  }
+  
+  .debug-info h4 {
+    color: #e5e7eb;
+  }
+  
+  .debug-section h5 {
+    color: #d1d5db;
+  }
+  
+  .debug-section p,
+  .debug-section ul {
+    color: #9ca3af;
+  }
+  
+  .debug-section pre,
+  .debug-section code {
+    background-color: #374151;
+    color: #e5e7eb;
+  }
+}

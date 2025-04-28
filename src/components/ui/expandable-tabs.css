@@ -1,0 +1,93 @@
+/* Expandable Tabs CSS */
+.expandable-tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.tab-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 0.75rem;
+  padding: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-button.selected {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tab-button.unselected {
+  color: #666;
+}
+
+.tab-button.unselected:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: #333;
+}
+
+.text-primary {
+  color: #646cff;
+}
+
+.text-indigo-500 {
+  color: #6366f1;
+}
+
+.text-sky-500 {
+  color: #0ea5e9;
+}
+
+.separator {
+  margin: 0 4px;
+  height: 24px;
+  width: 1.2px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tab-title {
+  overflow: hidden;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+  .expandable-tabs-container {
+    background: rgba(30, 30, 35, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .tab-button.selected {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .tab-button.unselected {
+    color: #aaa;
+  }
+  
+  .tab-button.unselected:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #eee;
+  }
+  
+  .separator {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}

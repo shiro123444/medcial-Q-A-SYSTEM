@@ -1,0 +1,488 @@
+/* GraphView.css */
+.graph-view-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: calc(100vh - 60px);
+  padding: 20px;
+}
+
+.graph-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.graph-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.graph-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.graph-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: #f3f4f6;
+}
+
+.graph-title-section {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex: 1;
+}
+
+.graph-panel-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-right: 10px;
+}
+
+.graph-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fullscreen-button {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.fullscreen-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #4b5563;
+}
+
+.connection-status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  margin-right: 0.5rem;
+}
+
+.connection-status.connected {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.connection-status.disconnected {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.toggle-button {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.toggle-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.graph-panel-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.graph-panel-content.visible {
+  max-height: calc(80vh - 40px);
+  opacity: 1;
+}
+
+.graph-panel-content.hidden {
+  max-height: 0;
+  opacity: 0;
+}
+
+.graph-controls {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* 搜索行 */
+.search-container {
+  padding: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.graph-search-form {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.graph-search-input {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px 0 0 12px;
+  outline: none;
+  font-size: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.graph-search-input:focus {
+  border-color: #646cff;
+  box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.15);
+}
+
+.graph-search-button {
+  background-color: #646cff;
+  color: white;
+  border: none;
+  padding: 0 20px;
+  border-radius: 0 12px 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 50px;
+}
+
+.graph-search-button:hover:not(:disabled) {
+  background-color: #535bf2;
+  transform: translateY(-1px);
+}
+
+.graph-search-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.graph-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 现代风格切换开关 */
+.modern-toggle {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e5e7eb;
+  transition: .3s;
+  border-radius: 20px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #646cff;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(16px);
+}
+
+.toggle-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* 图谱过滤器 */
+.graph-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-button {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-button:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.filter-button.active {
+  background-color: #f9fafb;
+  color: #374151;
+  border-color: #d1d5db;
+  font-weight: 500;
+}
+
+.filter-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.filter-dot.disease {
+  background-color: #ef4444;
+}
+
+.filter-dot.symptom {
+  background-color: #f59e0b;
+}
+
+.filter-dot.treatment {
+  background-color: #10b981;
+}
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  width: 250px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  z-index: 10;
+  margin-top: 0.5rem;
+}
+
+.auto-detect-toggle:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.graph-visualization-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 500px;
+  overflow: hidden;
+}
+
+.graph-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+  text-align: center;
+  height: 100%;
+  margin: auto;
+}
+
+.graph-empty-state h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 16px;
+}
+
+.graph-empty-state p {
+  font-size: 16px;
+  max-width: 400px;
+  margin-bottom: 8px;
+}
+
+.graph-visualization {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  background-color: #f9fafb;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  flex: 1;
+}
+
+/* 图形信息提示 */
+.graph-info-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  margin: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.graph-info-tip svg {
+  margin-right: 6px;
+  color: #6b7280;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  .graph-view-container {
+    left: 0;
+    max-width: 100%;
+  }
+  
+  .graph-visualization {
+    height: 350px;
+  }
+}
+
+/* 暗黑模式支持 */
+@media (prefers-color-scheme: dark) {
+  .graph-view-container {
+    color: #e5e7eb;
+  }
+  
+  .graph-header h2 {
+    color: #e5e7eb;
+  }
+  
+  .graph-content {
+    background-color: #1f2937;
+  }
+  
+  .search-container, .graph-tools {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .graph-search-input {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+  
+  .graph-search-input:focus {
+    border-color: #646cff;
+    box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.2);
+  }
+  
+  .toggle-text {
+    color: #9ca3af;
+  }
+  
+  .toggle-slider {
+    background-color: #4b5563;
+  }
+  
+  .filter-button {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #9ca3af;
+  }
+  
+  .filter-button:hover {
+    background-color: #4b5563;
+  }
+  
+  .filter-button.active {
+    background-color: #1f2937;
+    color: #e5e7eb;
+    border-color: #6b7280;
+  }
+  
+  .graph-empty-state {
+    color: #9ca3af;
+  }
+  
+  .graph-empty-state h2 {
+    color: #e5e7eb;
+  }
+  
+  .graph-visualization {
+    background-color: #111827;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .connection-status.connected {
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+  
+  .connection-status.disconnected {
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+  
+  .graph-info-tip {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+  
+  .graph-info-tip svg {
+    color: #d1d5db;
+  }
+}

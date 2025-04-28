@@ -1,0 +1,378 @@
+/* Logo.css - 改进版本 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+.logo-chat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  min-height: 100vh;
+  text-align: center;
+  padding-top: 120px; /* 增加顶部间距，让logo位于上方 */
+  transition: padding-left 0.3s ease;
+}
+
+.sidebar-visible .logo-chat-container {
+  padding-left: 280px;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.8s ease;
+  width: 100%;
+  overflow: visible;
+  position: relative;
+}
+
+.logo-container.initial {
+  opacity: 0;
+}
+
+.logo-container.animating,
+.logo-container.complete {
+  opacity: 1;
+}
+
+.logo-container.thinking .logo-icon {
+  animation: logoThinking 1.5s ease-in-out infinite;
+}
+
+/* 增强文字上移动画 */
+.logo-container.text-moving {
+  transform: translateY(-50vh);
+  opacity: 0.1;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
+}
+
+.logo-icon {
+  margin-bottom: 1.5rem;
+  transform: scale(0);
+  animation: logoIconAnimation 0.5s ease forwards;
+  transition: all 0.5s ease;
+}
+
+.logo-svg {
+  width: 90px; /* 增大logo图标 */
+  height: 90px;
+  transition: all 0.5s ease;
+}
+
+.logo-text {
+  font-size: 7.5rem; /* 增大50% */
+  display: flex;
+  overflow: visible;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.8s ease;
+  position: relative;
+  margin-bottom: 3rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.logo-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: letterAnimation 0.3s ease forwards;
+  margin: 0 2px;
+}
+
+.logo-container.complete .logo-letter {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 响应区域样式 */
+.response-container {
+  display: flex;
+  width: 100%;
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  align-items: flex-start;
+}
+
+.response-icon {
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.response-bubble {
+  background: rgba(100, 108, 255, 0.1);
+  border-radius: 18px;
+  padding: 1rem 1.5rem;
+  position: relative;
+  max-width: 80%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(100, 108, 255, 0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.response-bubble::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: -10px;
+  border-style: solid;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent rgba(100, 108, 255, 0.1) transparent transparent;
+}
+
+.response-text {
+  font-size: 1.2rem;
+  width: 100%;
+  text-align: left;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.response-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: fadeIn 0.1s ease forwards;
+}
+
+.response-thinking-icon {
+  animation: logoThinking 1.5s ease-in-out infinite;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.response-thinking-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* 新设计的聊天输入容器 - 参考Gemini样式 */
+.chat-input-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards 0.5s;
+  transition: padding-left 0.3s ease;
+}
+
+.sidebar-visible .chat-input-container {
+  padding-left: 140px; /* Half of the sidebar width to maintain centering */
+}
+
+/* Message input 样式优化 */
+.message-input-container {
+  display: flex;
+  align-items: flex-end;
+  background-color: transparent !important;
+  border-top: none !important;
+  padding: 1rem 1.5rem !important;
+  width: 100%;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.message-input-container:focus-within {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 修改textarea样式以匹配Gemini设计 */
+.message-input-container textarea {
+  flex: 1;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: inherit;
+  padding: 0.7rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-height: 150px;
+  min-height: 24px;
+  resize: none;
+  outline: none;
+}
+
+.message-input-container textarea:focus {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.send-button {
+  background-color: #646cff;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.send-button:hover:not(.disabled) {
+  background-color: #535bf2;
+  transform: scale(1.05);
+}
+
+.send-button.disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* 额外的功能按钮 */
+.input-extra-buttons {
+  display: flex;
+  margin-right: 10px;
+}
+
+.input-extra-button {
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  margin-right: 5px;
+  transition: background-color 0.2s;
+}
+
+.input-extra-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+@keyframes logoIconAnimation {
+  0% {
+    transform: scale(0) rotate(-90deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes letterAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes logoThinking {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes moveUpLetters {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50px);
+    opacity: 0.2;
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 5rem;
+  }
+  
+  .logo-svg {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .response-text {
+    font-size: 1rem;
+  }
+  
+  .response-bubble {
+    padding: 0.8rem 1.2rem;
+  }
+  
+  .chat-input-container {
+    bottom: 20px;
+    max-width: 90%;
+  }
+  
+  .sidebar-visible .logo-chat-container,
+  .sidebar-visible .chat-input-container {
+    padding-left: 0;
+  }
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .message-input-container {
+    background: rgba(40, 40, 50, 0.8) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  .message-input-container textarea {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .input-extra-button {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .input-extra-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}

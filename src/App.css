@@ -1,0 +1,366 @@
+/* App.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  background-color: #ffffff;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  margin: 0 auto;
+  transition: padding-left 0.3s ease;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  padding-top: 60px; /* Space for the navbar */
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  transition: padding-left 0.3s ease, width 0.3s ease, padding-right 0.3s ease;
+}
+
+/* When sidebar is visible, adjust the main content */
+.sidebar-visible .main-content {
+  padding-left: 280px;
+  width: calc(100% - 280px);
+}
+
+/* When sidebar is collapsed, use less padding */
+.sidebar-visible.sidebar-collapsed .main-content {
+  padding-left: 70px;
+  width: calc(100% - 70px);
+}
+
+/* Both views (chat and graph) share the same container */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: calc(100vh - 60px);
+  transition: all 0.3s ease;
+  padding-top: 0;
+  overflow-y: auto;
+}
+
+/* Center content vertically for empty states */
+.main-content .empty-state {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+/* ===== Navbar styles ===== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+.navbar.visible {
+  opacity: 1;
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-item {
+  margin-right: 30px;
+  padding: 5px 0;
+  cursor: pointer;
+  position: relative;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.nav-item:last-child {
+  margin-right: 0;
+}
+
+.nav-hover-effect {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #000;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-item:hover .nav-hover-effect, .nav-item.active .nav-hover-effect {
+  width: 100%;
+}
+
+.nav-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+  margin-top: 8px;
+}
+
+.nav-item:hover .nav-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-icon {
+  display: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+}
+
+.mobile-menu-icon:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Sidebar overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 250;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .sidebar-visible .main-content {
+    padding-left: 70px;
+    width: calc(100% - 70px);
+  }
+  
+  .graph-visible .main-content {
+    padding-right: 0;
+    width: 100%;
+  }
+  
+  .sidebar-visible.graph-visible .main-content {
+    padding-left: 70px;
+    padding-right: 0;
+    width: calc(100% - 70px);
+  }
+  
+  /* 全屏图谱模式响应式布局 */
+  .graph-fullscreen .graph-view-container {
+    left: 0;
+    width: 100%;
+  }
+  
+  .graph-fullscreen .main-content {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 100;
+    background-color: white;
+    height: calc(100vh - 60px);
+    top: 60px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .graph-fullscreen.show-chat .main-content {
+    transform: translateX(0);
+    width: 320px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 60px;
+  }
+  
+  .sidebar-visible .main-content {
+    padding-left: 0;
+    width: 100%;
+  }
+  
+  .mobile-menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+  }
+  
+  .navbar {
+    padding: 0 10px;
+  }
+  
+  .nav-tooltip {
+    display: none; /* Hide tooltips on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-left {
+    display: none;
+  }
+  
+  .navbar {
+    justify-content: space-between;
+  }
+  
+  .nav-item {
+    margin-right: 20px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+    color: #e5e7eb;
+  }
+  
+  .navbar {
+    background-color: rgba(30, 30, 35, 0.95);
+  }
+  
+  .nav-hover-effect {
+    background-color: #e5e7eb;
+  }
+  
+  .mobile-menu-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .graph-fullscreen .main-content {
+    background-color: #1a1a1a;
+  }
+}
+
+/* 视图切换按钮样式 */
+.view-switcher {
+  display: flex;
+  background-color: #f3f4f6;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  margin: 0 2px;
+}
+
+.view-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #4b5563;
+}
+
+.view-button.active {
+  background-color: white;
+  color: #646cff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.view-button svg {
+  margin-right: 6px;
+}
+
+.view-button span {
+  font-weight: 500;
+}
+
+/* 暗黑模式下视图切换按钮 */
+@media (prefers-color-scheme: dark) {
+  .view-switcher {
+    background-color: #374151;
+  }
+  
+  .view-button {
+    color: #9ca3af;
+  }
+  
+  .view-button:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #d1d5db;
+  }
+  
+  .view-button.active {
+    background-color: #1f2937;
+    color: #646cff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}
